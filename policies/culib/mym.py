@@ -11,3 +11,7 @@ def ema(ep, close, r):
 
 def check_cross(ema1, ema2):
     return abs(ema1 - ema2) < 0.3
+
+
+def buy_point():
+    pass
