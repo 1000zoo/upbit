@@ -1,14 +1,23 @@
-from culib import mym
 import pyupbit as pu
 
+#최대 20봉 안에서 최소값이면 매수
+#0.3% 이득 전까지는 매도 X
+#잘못된 코드
+#최소값 안바뀜
+
+HOUR = 60
+DAY = 24
+MONTH = 30
 XRP = "KRW-XRP"
-df = pu.get_ohlcv(XRP, interval="minute1", count=10080)
+BTC = "KRW-BTC"
+ETH = "KRW-ETH"
+ADA = "KRW-ADA"
+df = pu.get_ohlcv(XRP, interval="minute1", count=HOUR*DAY*3)
 
 init_money = 1_000_000
 current_money = init_money
 target_rate = 1.003
 
-fprice = 0
 count = 0
 average_price = 0
 buying_money = 0
@@ -42,3 +51,5 @@ for time, low in zip(df.index, df["low"]):
         print(str(time) + " : sell at " + str(low))
         print("earn rate : " + str(earn_rate))
         print("current money : " + str(current_money))
+
+print(buying_money * pu.get_current_price(XRP) / average_price)
