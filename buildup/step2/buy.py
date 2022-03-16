@@ -9,5 +9,5 @@ mu = pu.Upbit(Access_Key, Secrete_Key)
 bal = mu.get_balance()
 xrp = pu.get_current_price("KRW-XRP")
 all = bal / xrp - 1
-rec = mu.buy_limit_order("KRW-XRP", xrp, all)
+rec = mu.buy_limit_order("KRW-XRP", xrp - 5, all)
 print(rec)

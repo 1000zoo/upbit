@@ -13,17 +13,18 @@ ETH = 'KRW-ETH'
 FEE = 0.9995
 
 def main():
-    candles = pu.get_ohlcv(BTC, interval='minute1', count=H*12)
+    candles = pu.get_ohlcv(BTC, interval='minute1', count=H*D*M)
 
     init_bal = 1_000_000
     curr_bal = init_bal
     coin_bal = 0
     avg_price = 0
-    target_rate = 1.03
+    target_rate = 1.01
     loss_rate = 0.95
     cnt = 0
+    trade_count = 0
 
-    for time, low in zip(candles.index, candles['low']):
+    for time, low, close in zip(candles.index, candles['low'], candles['close']):
         #(1)
         if curr_bal != 0:
             if cnt == 0:
@@ -43,10 +44,12 @@ def main():
         #(3),(4)
         else:
             if target_rate*avg_price < low or low < loss_rate*avg_price:
-                rate, coin_bal, curr_bal = sellcoin(avg_price, low, coin_bal)
+                rate, coin_bal, curr_bal = sellcoin(avg_price, close, coin_bal)
                 print(str(time) + " : sell at " + str(low))
                 print("earn rate : " + str(rate))
                 print("current money : " + str(curr_bal))
+                trade_count += 1
+                print("trade_count %s" %trade_count)
     print(pu.get_current_price(BTC) / avg_price * coin_bal)
 
 def buycoin(price, bal):
