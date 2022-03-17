@@ -12,11 +12,11 @@ DAY=24*HOUR
 FEE = 0.9995
 BTC="KRW-BTC"
 
-TARGET = 1.0043
-LOSS = 0.992
+TARGET = 1.0033
+LOSS = 0.99
 
-COMPARE_A = 0.985
-COMPARE_B = 0.9925
+COMPARE_A = 0.988
+COMPARE_B = 0.995
 
 def main():
     up = pu.Upbit(Access_Key, Secrete_Key)
@@ -28,7 +28,7 @@ def main():
     init_bal = up.get_balance()
     print_with_timestemp("start at ")
 
-    while time.time() - timer < 9*HOUR:
+    while time.time() - timer < 8*HOUR:
         curr_price = pu.get_current_price(BTC)
         if buyT_sellF:
             if buy_condition(reset_time) == "case1":
@@ -98,11 +98,11 @@ def print_time(avg=0, curr=0):
 
 def buy_condition(rtime):
     switch = time.time() - rtime
-    if switch < 2*MIN:
+    if switch < 1*MIN:
         return "case1"
-    elif switch < 4*MIN:
+    elif switch < 7*MIN:
         return "case2"
-    elif switch < 8*MIN:
+    elif switch < 20*MIN:
         return "case3"
     else:
         return "buy"

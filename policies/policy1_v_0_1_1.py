@@ -18,13 +18,16 @@ LOSS = 0.992
 COMPARE_A = 0.985
 COMPARE_B = 0.9925
 
+ADJ_T = 0.999
+ADJ_L = 1.001
+
 def main():
     up = pu.Upbit(Access_Key, Secrete_Key)
-    avg_price = 0
     timer = time.time()
     reset_time = timer
     min_price = pu.get_current_price(BTC)
     init_bal = up.get_balance()
+    avg_price = up.get_avg_buy_price(BTC)
     print_with_timestemp("start at ")
 
     while time.time() - timer < 9*HOUR:
@@ -47,7 +50,7 @@ def main():
             print_time()
             buy(up)
             avg_price = pu.get_current_price(BTC)
-        else:
+        elif can_sell(up.get_amount(BTC)):
             curr_price = pu.get_current_price(BTC)
             if TARGET*avg_price < curr_price or \
                 curr_price < LOSS*avg_price:
@@ -57,6 +60,9 @@ def main():
                 print_rate(avg_price, curr_price, roe)
                 reset_time = time.time()
                 min_price = pu.get_current_price(BTC)
+        else:
+            print("no money & coin")
+            break
         time.sleep(0.5)
 
     print_with_timestemp("end at ")
@@ -64,7 +70,13 @@ def main():
     print("final balance: " + str(up.get_balance()))
 
 def can_buy(w):
-    return w > 5000
+    return w > 6000
+
+def can_sell(v):
+    return v > 6000
+
+def hold_range(avg, curr, t, l):
+    return t*avg < curr or curr < l*avg
 
 def print_with_timestemp(string):
     print(string + str(datetime.datetime.now()))
