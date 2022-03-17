@@ -15,25 +15,34 @@ BTC="KRW-BTC"
 TARGET = 1.0043
 LOSS = 0.992
 
+COMPARE_A = 0.985
+COMPARE_B = 0.9925
+
 def main():
     up = pu.Upbit(Access_Key, Secrete_Key)
     avg_price = 0
-    timer = time.time()
-    reset_time = time.time()
-    min_price = pu.get_current_price(BTC)
     buyT_sellF = True
+    timer = time.time()
+    reset_time = timer
+    min_price = pu.get_current_price(BTC)
     init_bal = up.get_balance()
-    print("start at" + str(datetime.datetime.now()))
+    print_with_timestemp("start at ")
 
     while time.time() - timer < 9*HOUR:
         curr_price = pu.get_current_price(BTC)
         if buyT_sellF:
-            if buy_condition(reset_time) == "wait":
+            if buy_condition(reset_time) == "case1":
                 min_price = min(min_price, pu.get_current_price(BTC))
                 time.sleep(0.5)
                 continue
-            elif buy_condition(reset_time) == "any":
-                if min_price <= pu.get_current_price(BTC):
+            elif buy_condition(reset_time) == "case2":
+                if min_price*COMPARE_A <= pu.get_current_price(BTC):
+                    min_price = min(min_price, pu.get_current_price(BTC))
+                    time.sleep(0.5)
+                    continue
+            elif buy_condition(reset_time) == "case3":
+                if min_price*COMPARE_B <= pu.get_current_price(BTC):
+                    min_price = min(min_price, pu.get_current_price(BTC))
                     time.sleep(0.5)
                     continue
             print_time()
@@ -52,17 +61,24 @@ def main():
                 min_price = pu.get_current_price(BTC)
         time.sleep(0.5)
 
+    print_with_timestemp("end at ")
     print("initial balance: " + str(init_bal))
     print("final balance: " + str(up.get_balance()))
 
+
+def print_with_timestemp(string):
+    print(string + str(datetime.datetime.now()))
+
 def buy(up):
     print("buy at " + str(pu.get_current_price(BTC)))
-    print(up.buy_market_order(BTC, up.get_balance()*FEE))
+    print_with_timestemp("time : ")
+    up.buy_market_order(BTC, up.get_balance()*FEE)
     print("="*15)
 
 def sell(up):
     print("sell")
-    print(up.sell_market_order("KRW-BTC", up.get_balance("KRW-BTC")))
+    print_with_timestemp("time : ")
+    up.sell_market_order("KRW-BTC", up.get_balance("KRW-BTC"))
 
 def print_rate(avg, curr):
     try:
@@ -82,12 +98,14 @@ def print_time(avg=0, curr=0):
 
 def buy_condition(rtime):
     switch = time.time() - rtime
-    if switch < 1*MIN:
-        return "wait"
-    elif switch > 5*MIN:
-        return "ask"
+    if switch < 2*MIN:
+        return "case1"
+    elif switch < 4*MIN:
+        return "case2"
+    elif switch < 8*MIN:
+        return "case3"
     else:
-        return "any"
+        return "buy"
 
 def sell_condition(up):
     return 
