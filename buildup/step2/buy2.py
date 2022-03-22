@@ -8,3 +8,9 @@ BTC = "KRW-BTC"
 amin = 100_000_000
 
 print(min(amin, pu.get_current_price(BTC)))
+
+k = up.buy_market_order("KRW-BTC", up.get_balance()*FEE)
+t = []
+print(k)
+(t.append(k["volume"]))
+print(t)

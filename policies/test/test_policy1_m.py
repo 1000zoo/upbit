@@ -35,6 +35,7 @@ def main():
             elif cnt > 10 or min_price > low:
                 avg_price, coin_bal, curr_bal = buycoin(low, curr_bal)
                 print(str(time) + " : buy at " + str(avg_price))
+                
                 cnt = 0
             else:
                 cnt += 1

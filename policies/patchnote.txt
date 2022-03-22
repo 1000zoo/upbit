@@ -20,3 +20,18 @@ v0.2.1 :
 comp & loss 를 초기화 해놓지 않아서
 매수매도가 끊임없이 진행됐었음
 => -40% 손실
+*excelog 추가*
+
+v0.2.2 :
+*excel에 기록할 데이터가 None 이면 "-"로 대체하는 none_check 함수 추가
+*buy & sell 함수에 data_update 함수가 쓰이지 않아서 data가 기록되지 않던 거 수정
+*BFEE 추가 (FEE는 매수수수료, BFEE는 총 수수료)
+
+v0.2.3 :
+*roe 구하는 식 변경
+*변수명 변경 (reset_time => reset_timer)
+*excelog 저장이름 변경 (실행 시간이 찍히도록)
+
+
+v0.3.0 :
+*main 함수 내부 및 코드 정리 (data 같은거)

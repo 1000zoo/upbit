@@ -11,17 +11,18 @@ MIN=60*SEC
 HOUR=60*MIN
 DAY=24*HOUR
 
+BFEE = 0.9995
 FEE = 0.999
 BTC="KRW-BTC"
 
 TARGET = 1.0063
-LOSS = 0.9925
+LOSS = 0.9755
 
 COMPARE = 0.9852
 
-ADJ_T = 0.9993
-ADJ_L = 1.0013
-ADJ_C = 1.0015
+ADJ_T = 0.99993
+ADJ_L = 1.00001
+ADJ_C = 1.00342
 data = {
     "time" : [],
     "trade type" : [],
@@ -29,12 +30,14 @@ data = {
     "trade volume" : [],
     "target" : [],
     "loss" : [],
-    "comp" : []
+    "comp" : [],
+    "current balance" : []
 }
 def main():
     up = pu.Upbit(Access_Key, Secrete_Key)
     timer = time.time()
-    reset_time = timer
+    reset_timer = timer
+    start_time = datetime.datetime.now()
     min_price = pu.get_current_price(BTC)
     init_bal = up.get_balance()
     avg_price = up.get_avg_buy_price(BTC)
@@ -43,30 +46,42 @@ def main():
     comp = COMPARE
     print_with_timestemp("start at ")
 
-    while time.time() - timer < 2*HOUR:
+    while time.time() - timer < 3*HOUR:
         try:
             curr_price = pu.get_current_price(BTC)
             if can_buy(up.get_balance()):
-                if past_time(reset_time):
+                if past_time(reset_timer):
                     comp *= ADJ_C
-                    reset_time = time.time()
+                    reset_timer = time.time()
                 if min_price*comp > curr_price:
                     buy(up, curr_price)
                     avg_price = pu.get_current_price(BTC)
                     print(comp)
-                    reset_time = time.time()
+                    reset_timer = time.time()
+                    try:
+                        data["target"].append(0)
+                        data["loss"].append(0)
+                        data["comp"].append(comp)
+                    except KeyError as err:
+                        print(err)
                     comp = COMPARE
                 else:
                     min_price = min(min_price, curr_price)
             elif can_sell(up.get_amount(BTC)):
-                if past_time(reset_time):
+                if past_time(reset_timer):
                     target *= ADJ_T
                     loss *= ADJ_L
                 if hold_range(avg_price, curr_price, target, loss):
                     sell(up, avg_price, curr_price)
                     print(target, loss)
-                    reset_time = time.time()
+                    reset_timer = time.time()
                     min_price = pu.get_current_price(BTC)
+                    try:
+                        data["target"].append(target)
+                        data["loss"].append(loss)
+                        data["comp"].append(0)
+                    except KeyError as err:
+                        print(err)
                     target = TARGET
                     loss = LOSS
             else:
@@ -77,7 +92,8 @@ def main():
             print(err)
             break
         
-    excelog.excelog(data, title="excelog_test_2")
+    print(data)
+    excelog.excelog(data, title="excelog-" + excelog.datetime_to_title(start_time))
     print_with_timestemp("end at ")
     print("initial balance: " + str(init_bal))
     print("final balance: " + str(up.get_balance()))
@@ -99,22 +115,30 @@ def print_with_timestemp(string):
 def buy(up, curr):
     print_time()
     print("buy at " + str(curr))
-    d = up.buy_market_order(BTC, up.get_balance()*FEE)
+    d = up.buy_market_order(BTC, up.get_balance()*BFEE)
+    update_data(d, up)
     print("="*15)
 
 def sell(up, avg, curr):
     print_time()
     print("sell at " + str(curr))
-    roe = up.get_amount(BTC) * (1.0 - (avg / curr))
+    roe = up.get_amount(BTC) * (1.0 * BFEE - (avg / curr))
     print_rate(avg, curr, roe)
     d = up.sell_market_order("KRW-BTC", up.get_balance("KRW-BTC"))
+    update_data(d, up)
 
-def update_data(info):
+def update_data(info, up):
     try:
         data["time"].append(none_check(info["created_at"]))
         data["trade type"].append(none_check(info["side"]))
         data["trade price"].append(none_check(info["price"]))
         data["trade volume"].append(none_check(info["volume"]))
+        if info["side"] == 'bid':
+            data["current balance"].append(up.get_amount(BTC))
+        elif info["side"] == 'ask':
+            data["current balance"].append(up.get_balance())
+        else:
+            data["current balance"].append("-")
     except KeyError as err:
         print(err)
 
