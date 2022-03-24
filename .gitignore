@@ -147,4 +147,5 @@ cython_debug/
 .DS_Store
 ___key___.py
 *.xlsx
+/excelog_files
 
