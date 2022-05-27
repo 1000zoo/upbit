@@ -10,9 +10,9 @@ to = 언제 데이터를 불러올 것인지
 import pyupbit as pu
 
 BTC = "KRW-BTC"
-interval = "minute1"
+interval = "minute240"
 count = 31
-to = "202204212200"
+to = "20220421"
 candle = pu.get_ohlcv(BTC, count=count, interval=interval, to=to)
 
 """
@@ -62,6 +62,7 @@ SID = "sideways/"
 INCPER = 1.01
 DECPER = 0.99
 
+print(type(candle.index))
 candle.reset_index(drop=False, inplace=True)
 p1 = candle.loc[count-2]["close"]
 p2 = candle.loc[count-1]["high"]
