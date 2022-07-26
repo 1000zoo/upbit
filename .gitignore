@@ -148,4 +148,7 @@ cython_debug/
 ___key___.py
 *.xlsx
 /excelog_files
+/candle_dat
+*.jpg
+*.jpeg
 
