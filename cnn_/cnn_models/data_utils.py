@@ -12,7 +12,6 @@ def load(root, type_index):
     path = join(root, ttv[type_index])
     return data_generator(path)
 
-        
 def join(root, path):
     return os.path.join(root, path)
 
