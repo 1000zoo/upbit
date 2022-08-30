@@ -147,8 +147,11 @@ cython_debug/
 .DS_Store
 ___key___.py
 *.xlsx
+
 /excelog_files
 /candle_dat
 *.jpg
 *.jpeg
-
+/figure
+/model
+/data

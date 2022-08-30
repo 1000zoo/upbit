@@ -18,7 +18,14 @@ def sel(s=""):
     else:
         print(s)
 
-import my_models as mm
 
-m = mm.model1([128,128,3])
-print(type(m))
+def bb(s):
+    print(3*s//5, 1*s//5, 1*s//5)
+
+
+
+def combined(*args):
+    for a in args:
+        print(a)
+
+combined(1,2,3,4,5)
