@@ -150,6 +150,7 @@ ___key___.py
 
 /excelog_files
 /candle_dat
+*.h5
 *.jpg
 *.jpeg
 /figure
