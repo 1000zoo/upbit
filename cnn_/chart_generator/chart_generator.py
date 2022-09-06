@@ -26,7 +26,7 @@ function:
         - generate_images
 """
 ## 경로설정
-PATH = "/Users/1000zoo/Documents/prog/data_files/ccat_data/"
+PATH = "C:/Users/cjswl/python-data/ccat-data/"
 TEST = PATH + "test/"
 VAL = PATH + "val/"
 TRAIN = PATH + "train/"
@@ -35,7 +35,7 @@ INC = "increase/"
 SID = "sideways/"
 
 ## 퍼센테이지 설정
-INCPER = 1.0025
+INCPER = 1.0019
 DECPER = 0.9965
 
 ## 봉 수 설정
@@ -44,7 +44,7 @@ TCOUNT = 45
 ## 캔들 pandas data 가져오기
 def get_ohlcv(ticker="KRW-BTC", count=TCOUNT):
     M = "minute"
-    interval_list = [3, 5, 10, 15]
+    interval_list = [1, 3, 5, 10, 15, 30, 60]
 
     while True:
         il = random.choice(interval_list)
@@ -176,7 +176,7 @@ def my_format(t):
         return str(t)
 
 ## main
-def generate_images(count=1000, path=TRAIN, ticker="KRW-BTC", shuffle=True):
+def generate_images(count=1000, path=TRAIN, ticker="KRW-BTC", shuffle=True, with_sideway=True):
     ## 변수 초기화
     dcount = icount = scount = 0
     c = 0
@@ -191,18 +191,17 @@ def generate_images(count=1000, path=TRAIN, ticker="KRW-BTC", shuffle=True):
     ## main loop
     for to, il, candle in get(ticker=ticker):
         ## 종료 조건문
-        """
-        TODO
-        다른 dataset 에 중복 안들어가게 하기
-        같은 dataset끼리는 상관없이
-        """
-        if path == VAL:
-            dlist = []
-
         if dcount >= count and icount >= count and scount >= count:
             break
         # if time.time() - starttime > 600:
         #     break
+
+        if il == 1:
+            irate = INCPER
+            drate = DECPER
+        else:
+            irate = INCPER * (1 + il * 2 / 10000)
+            drate = DECPER * (1 - il * 2 / 10000)
 
         ## 차트 불러오기 ()
         colorset = mpf.make_marketcolors(up='r', down='b', volume='blue')
@@ -226,7 +225,7 @@ def generate_images(count=1000, path=TRAIN, ticker="KRW-BTC", shuffle=True):
         moveto = path
 
         ## 최종가격의 INCPER(>1) 배가 pinc보다 낮다면, 상승
-        if p1 * INCPER < pinc:
+        if p1 * irate < pinc:
             ## 원하는 데이터 수를 채웠으면 스킵
             if icount < count:
                 moveto += INC
@@ -242,7 +241,7 @@ def generate_images(count=1000, path=TRAIN, ticker="KRW-BTC", shuffle=True):
                 else:
                     continue
         ## 최종가격의 DECPER(<1) 배가 정답의 평균가보다 높다면, 하락
-        elif p1 * DECPER > pdec:
+        elif p1 * drate > pdec:
             if dcount < count:
                 moveto += DEC
                 dcount += 1
@@ -257,18 +256,21 @@ def generate_images(count=1000, path=TRAIN, ticker="KRW-BTC", shuffle=True):
                     continue
         ## 어느쪽에도 해당되지 않는다면 횡보
         else:
-            if scount < count:
-                moveto += SID
-                scount += 1
-                c = scount
-                tp = SID
-            else:
-                if probability(0.09):
+            if with_sideway:
+                if scount < count:
                     moveto += SID
-                    c = int(random.random() * count) + 1
+                    scount += 1
+                    c = scount
                     tp = SID
                 else:
-                    continue
+                    if probability(0.09):
+                        moveto += SID
+                        c = int(random.random() * count) + 1
+                        tp = SID
+                    else:
+                        continue
+            else:
+                continue
         
         ## 학습용 차트와 확인용 차트 저장
         area = (165, 70, 710, 480)
@@ -289,9 +291,4 @@ def probability(p):
     return p > random.random()
 
 if __name__ == "__main__":
-    print("generate train data")
-    generate_images(1500, TRAIN, shuffle=True)
-    print("generate validation data")
-    generate_images(250, VAL, shuffle=True)
-    print("generate test data")
-    generate_images(200, TEST, shuffle=True)
+    generate_images(10000, TRAIN, shuffle=False)
