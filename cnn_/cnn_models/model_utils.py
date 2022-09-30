@@ -20,3 +20,5 @@ def myCompile(model):
             optimizer = optimizers.RMSprop(learning_rate=1e-5),
             loss = "categorical_crossentropy", metrics = ["accuracy"]
     )
+def load_model(title):
+    return models.load_model(title)

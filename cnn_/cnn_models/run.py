@@ -1,14 +1,15 @@
 import data_utils as du
 import my_models as mm
 import etc_utils as eu
+import model_utils as mu
 import os
 
 import time
 
-
-DATA_DIR = "/Users/1000zoo/Documents/prog/data_files/ccat_data"
+#C:\Users\cjswl\python-data\ccat-data\train
+DATA_DIR = "C:/Users/cjswl/python-data/ccat-data/"
 # DATA_DIR = "/Users/1000zoo/Documents/prog/data_files/dogs_and_cats"
-EPOCH = 3
+EPOCH = 100
 INPUT_SHAPE = (128,128,3)
 """
 https://github.com/1000zoo/upbit
@@ -62,15 +63,18 @@ class Train():
 
         self.model = mm.model2(INPUT_SHAPE)
 
-    def train(self, model_name, train_type):
+    def train(self, model_name, train_type):            
+        self.model.summary()
+
         history = self.model.fit(
             self.train_data, epochs = EPOCH, validation_data = self.val_data
         )
         eu.modeldir()
 
         title = eu.string_combined(model_name, "_", train_type)
+        self.title = eu.string_combined(title, ".h5")
 
-        self.model.save(os.path.join("model", eu.string_combined(title, ".h5")))
+        self.model.save(os.path.join("model", self.title))
 
         test_loss, test_acc = self.model.evaluate(self.test_data)
         print("test_loss", test_loss)
@@ -79,12 +83,12 @@ class Train():
         eu.myPlot(history, title)
 
     def finetuning(self, model_name):
+        self.model = mu.load_model(os.path.join("model", self.title))
+    
         conv_base = self.model.layers[0]
         for layer in conv_base.layers:
             if layer.name.startswith("block5"):
                 layer.trainable = True
-
-        mm.mu.myCompile(self.model)
         self.train(model_name, "finetuning")
 
 def main():

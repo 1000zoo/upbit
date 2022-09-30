@@ -15,7 +15,7 @@ def load(root, type_index):
 def join(root, path):
     return os.path.join(root, path)
 
-def data_generator(path, target_size=(128,128), batch_size=20, class_mode="categorical"):
+def data_generator(path, target_size=(128,128), batch_size=100, class_mode="categorical"):
     datagen = ImageDataGenerator(1./255)
     return datagen.flow_from_directory(
         path,
