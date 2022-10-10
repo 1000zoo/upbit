@@ -21,7 +21,7 @@ MODEL = os.path.join("model", "model2.h5")
 def fname(interval : str):
     return interval + ".jpg"
 
-def image_generator(ticker="KRW-BTC", count= 41, interval="minute3"):
+def image_generator(ticker="KRW-BTC", count=41, interval="minute3"):
     candle = pu.get_ohlcv(ticker, count=count, interval=interval)
     colorset = mpf.make_marketcolors(up='r', down='b', volume='blue')
     s = mpf.make_mpf_style(marketcolors=colorset)
@@ -34,7 +34,7 @@ def image_generator(ticker="KRW-BTC", count= 41, interval="minute3"):
 
 def img_processing(interval="minute3"):
     image_path = os.path.join(DPATH, fname(interval))
-    img = image.load_img(image_path, target_size = (48, 48))
+    img = image.load_img(image_path, target_size=(128, 128))
     img_tensor = image.img_to_array(img)
     img_tensor = np.expand_dims(img_tensor, axis=0)
     img_tensor = preprocess_input(img_tensor)
@@ -42,17 +42,16 @@ def img_processing(interval="minute3"):
 
 def predictor():
     interval = ["3", "5", "10", "15"]
-    sum = np.array([[0.0,0.0,0.0]])
+    sum = np.array([[0.0, 0.0, 0.0]])
     model = load_model(MODEL)
     for i in interval:
         itv = "minute" + i
         image_generator(interval=itv)
         img = img_processing(itv)
         pred = model.predict(img)
-        print(type(pred))
-        print(pred)
         sum += pred
-    print(sum)
-    
+    print(sum.argmax())
+    return sum
+
 
 

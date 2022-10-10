@@ -13,7 +13,7 @@ def login():
         print("login succeed")
 
 
-def time_stamp(s = "None"):
+def time_stamp(s="None"):
     print(datetime.datetime.now(), ":", s)
 
 

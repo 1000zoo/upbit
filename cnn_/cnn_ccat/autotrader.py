@@ -4,7 +4,7 @@ from util import *
 from constant import *
 from aiutil import *
 
-class myUpbit():
+class myUpbit:
     def __init__(self):
         self.up = login()
 
