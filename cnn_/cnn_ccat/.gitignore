@@ -1,4 +1,5 @@
 model/
+data/
 ___key___.py
 test.py
 venv/
