@@ -50,7 +50,6 @@ def predictor():
         img = img_processing(itv)
         pred = model.predict(img)
         sum += pred
-    print(sum.argmax())
     return sum
 
 
