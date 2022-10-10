@@ -1,3 +1,7 @@
+## Setting
+DPATH = "data/"
+MPATH = "model/"
+
 
 ## Tiker
 BTC = "KRW-BTC"

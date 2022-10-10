@@ -8,21 +8,25 @@ class myUpbit():
     def __init__(self):
         self.up = login()
 
-    def buy(self, tiker=BTC, amount=10000):
+    def buy(self, ticker=BTC, amount=10000):
         up = self.up
-        s = (up.buy_market_order(BTC, amount))
+        s = (up.buy_market_order(ticker, amount))
         time_stamp(s)
         pass
 
-    def sell(self, tiker=BTC, amount=10000):
+    def sell(self, ticker=BTC, amount=10000):
         up = self.up
-        print(up.sell_market_order(BTC, amount))
+        s = up.sell_market_order(ticker, amount)
+        time_stamp(s)
         pass
 
     def print_balance(self):
         up = self.up
         print(up.get_balance())
 
+def setup():
+    check_path(DPATH)
+    check_path(MPATH)
 
 def main():
     up = myUpbit()
@@ -32,4 +36,5 @@ def main():
     predictor()
 
 if __name__ == "__main__":
+    setup()
     main()
