@@ -41,11 +41,11 @@ def main():
                 up.sell()
                 buy = False
 
-        if pred.argmax == 1 and not buy:
+        if pred.argmax() == 1 and not buy:
             buy = True
             up.buy()
             up.print_balance()
-        if pred.argmax == 0 and buy:
+        if pred.argmax() == 0 and buy:
             buy = False
             up.sell()
             up.print_balance()
