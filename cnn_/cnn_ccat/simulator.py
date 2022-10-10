@@ -34,11 +34,12 @@ def main():
     buy = False
     while True:
         pred = predictor()
-        roe = pu.get_current_price() / up.buy_price
 
-        if buy and (roe > 1.05 * 0.999 or roe < 0.995 * 0.999):
-            up.sell()
-            buy = False
+        if buy:
+            roe = pu.get_current_price() / up.buy_price
+            if roe > 1.05 * 0.999 or roe < 0.995 * 0.999:
+                up.sell()
+                buy = False
 
         if pred.argmax == 1 and not buy:
             buy = True
