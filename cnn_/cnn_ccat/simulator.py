@@ -5,11 +5,17 @@ from constant import *
 from aiutil import *
 import datetime
 
+"""
+지우는 법
+WARNING:tensorflow:Error in loading the saved optimizer state. As a result, your model is starting with a freshly initialized optimizer
+https://stackoverflow.com/questions/49195189/error-loading-the-saved-optimizer-keras-python-raspberry
+"""
+
 class myUpbit:
     def __init__(self):
         self.up = login()
         self.balance = 1_000_000
-        self.buy_price = 0
+        self.buy_price = pu.get_current_price(BTC)
 
     def buy(self, ticker=BTC, amount=10000):
         self.buy_price = pu.get_current_price(BTC)
@@ -30,32 +36,38 @@ def setup():
 
 def main():
     up = myUpbit()
+    st = time.time()
     pt = time.time()
     buy = False
+    pred = predictor()
     while True:
-        pred = predictor()
+        time.sleep(0.5)
+        if _past_time(pt, 60):
+            pred = predictor()
+            pt = time.time()
 
         if buy:
-            roe = pu.get_current_price() / up.buy_price
-            if roe > 1.05 * 0.999 or roe < 0.995 * 0.999:
+            roe = pu.get_current_price(BTC) / up.buy_price
+            if roe > 1.015 or roe < 0.99:
                 up.sell()
                 buy = False
+            if pred.argmax() == 0:
+                buy = False
+                up.sell()
+                up.print_balance()
 
-        if pred.argmax() == 1 and not buy:
-            buy = True
-            up.buy()
-            up.print_balance()
-        if pred.argmax() == 0 and buy:
-            buy = False
-            up.sell()
-            up.print_balance()
+        else:
+            if pred.argmax() == 1:
+                buy = True
+                up.buy()
+                up.print_balance()
 
-        if _past_time(pt):
+        if _past_time(st, 6 * 60 * 60):
             break
 
 
-def _past_time(_time):
-    return time.time() - _time > 5 * 60 * 60
+def _past_time(_time, _set_time):
+    return time.time() - _time > _set_time
 
 if __name__ == "__main__":
     setup()
